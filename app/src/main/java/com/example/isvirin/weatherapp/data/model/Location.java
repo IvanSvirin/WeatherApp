@@ -1,5 +1,8 @@
 package com.example.isvirin.weatherapp.data.model;
 
+import android.os.Parcel;
+
+
 public class Location {
     private String name;
     private String country;
@@ -10,7 +13,6 @@ public class Location {
     }
 
     public Location() {
-
     }
 
     public String getName() {

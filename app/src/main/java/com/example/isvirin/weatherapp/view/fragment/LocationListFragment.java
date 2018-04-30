@@ -1,5 +1,8 @@
 package com.example.isvirin.weatherapp.view.fragment;
 
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +19,9 @@ import com.example.isvirin.weatherapp.R;
 
 import java.util.ArrayList;
 
+import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_COUNTRY;
+import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_NAME;
+
 public class LocationListFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<Location> locations = new ArrayList<>();
@@ -24,7 +30,7 @@ public class LocationListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getArguments();
+//        getArguments();
     }
 
     @Nullable
@@ -38,7 +44,8 @@ public class LocationListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.list_view_locations);
-        init();
+//        init();
+        readDataWithCP();
 
         locationsAdapter = new LocationsAdapter(locations);
         recyclerView.setAdapter(locationsAdapter);
@@ -52,4 +59,17 @@ public class LocationListFragment extends Fragment {
             locations.add(location);
         }
     }
+
+    private void readDataWithCP() {
+        ContentResolver contentResolver = getActivity().getContentResolver();
+        Cursor cursor = contentResolver.query(Uri.parse("content://com.example.isvirin.weatherapp.data.DBContentProvider/items"), null, null, null, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                locations.add(new Location(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_COUNTRY))));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
 }

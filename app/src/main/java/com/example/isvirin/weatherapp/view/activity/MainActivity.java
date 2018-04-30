@@ -1,10 +1,13 @@
 package com.example.isvirin.weatherapp.view.activity;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -38,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_COUNTRY;
+import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_NAME;
 import static com.example.isvirin.weatherapp.service.LocationService.GEO_INFO;
 import static com.example.isvirin.weatherapp.service.LocationService.LOCATION;
 
@@ -82,14 +87,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        testFile();
 
         testDB();
+        readDataWithCP();
+    }
+
+    private void readDataWithCP() {
+        ArrayList<Location> locations = new ArrayList<>();
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = contentResolver.query(Uri.parse("content://com.example.isvirin.weatherapp.data.DBContentProvider/items"), null, null, null, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                locations.add(new Location(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_COUNTRY))));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
     }
 
     private void testDB() {
         DataBaseSQLite dataBaseSQLite = new DataBaseSQLite(this);
         dataBaseSQLite.open();
-        dataBaseSQLite.write(new Location("name", "country"));
-        List<Location> locations = Collections.emptyList();
-        locations = dataBaseSQLite.get();
+        ArrayList<Location> locations = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            dataBaseSQLite.write(new Location("name" + i, "country" + i));
+        }
+
+//        List<Location> locations = Collections.emptyList();
+//        locations = dataBaseSQLite.get();
         dataBaseSQLite.close();
     }
 

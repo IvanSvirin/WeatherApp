@@ -9,8 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.isvirin.weatherapp.data.model.Location;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
 
 public class DataBaseSQLite {
     public static final String DB_NAME = "our_db";
@@ -62,25 +61,29 @@ public class DataBaseSQLite {
         dbHelper.close();
     }
 
-    public void write(Location location){
+    public SQLiteDatabase getDatabase(){
+        return database;
+    }
+
+    public void write(Location location) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_NAME, location.getName());
         cv.put(COLUMN_COUNTRY, location.getCountry());
         database.insert(DB_TABLE, null, cv);
     }
 
-    public List<Location> get() {
+    public ArrayList<Location> get() {
         Cursor cursor = database.query(DB_TABLE, null, null, null, null, null, null);
-        List<Location> locations = Collections.emptyList();
-        cursor.moveToFirst();
+        ArrayList<Location> locations = new ArrayList<>();
         Location location = new Location();
-        while(cursor.moveToNext()) {
+        cursor.moveToFirst();
+        do {
             String s = cursor.getString(cursor.getColumnIndex(COLUMN_NAME));
             String f = cursor.getString(cursor.getColumnIndex(COLUMN_COUNTRY));
             location.setName(s);
             location.setCountry(f);
             locations.add(location);
-        }
+        } while (cursor.moveToNext());
         cursor.close();
         return locations;
     }

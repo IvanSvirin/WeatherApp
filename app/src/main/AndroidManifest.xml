@@ -26,6 +26,10 @@
 
         <service android:name=".service.LocationService" />
 
+        <provider
+            android:authorities="com.example.isvirin.weatherapp.data.DBContentProvider"
+            android:name=".data.DBContentProvider"/>
+
     </application>
 
 </manifest>
