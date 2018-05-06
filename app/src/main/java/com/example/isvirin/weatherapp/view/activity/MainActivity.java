@@ -1,5 +1,6 @@
 package com.example.isvirin.weatherapp.view.activity;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -10,8 +11,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -32,10 +35,12 @@ import com.example.isvirin.weatherapp.data.cache.DataBaseSQLite;
 import com.example.isvirin.weatherapp.data.cache.FileManager;
 import com.example.isvirin.weatherapp.data.cache.SharedPreferencesManager;
 import com.example.isvirin.weatherapp.data.model.Location;
+import com.example.isvirin.weatherapp.service.RequestService;
 import com.example.isvirin.weatherapp.util.Util;
 import com.example.isvirin.weatherapp.view.fragment.ForecastListFragment;
 import com.example.isvirin.weatherapp.view.fragment.LocationListFragment;
 import com.example.isvirin.weatherapp.service.LocationService;
+import com.example.isvirin.weatherapp.view.fragment.RequestFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +50,8 @@ import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_CO
 import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_NAME;
 import static com.example.isvirin.weatherapp.service.LocationService.GEO_INFO;
 import static com.example.isvirin.weatherapp.service.LocationService.LOCATION;
+import static com.example.isvirin.weatherapp.service.RequestService.WEATHER;
+import static com.example.isvirin.weatherapp.service.RequestService.WEATHER_REQUEST;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ImageView imageView;
@@ -83,11 +90,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         imageView = findViewById(R.id.image_view);
 
 //        showNotification();
-//        defineLocation();
 //        testFile();
 
-        testDB();
-        readDataWithCP();
+//        testDB();
+//        readDataWithCP();
+//        startService(new Intent(this, RequestService.class));
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        defineLocation();
     }
 
     private void readDataWithCP() {
@@ -127,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         registerReceiver(broadcastReceiver, new IntentFilter(GEO_INFO));
+        registerReceiver(broadcastReceiverWeather, new IntentFilter(WEATHER_REQUEST));
 
     }
 
@@ -134,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onPause() {
         super.onPause();
         unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(broadcastReceiverWeather);
     }
 
     private void defineLocation() {
@@ -235,6 +251,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             preferencesManager.saveString(USER_LOCATION, location);
 
             Util.showOurDialog(context, "Ваш город - " + location + "?");
+        }
+    };
+
+    BroadcastReceiver broadcastReceiverWeather = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String string = intent.getStringExtra(WEATHER);
+            RequestFragment requestFragment = new RequestFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(WEATHER, string);
+            requestFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, requestFragment).commit();
         }
     };
 }

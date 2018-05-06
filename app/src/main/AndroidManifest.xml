@@ -3,7 +3,9 @@
     package="com.example.isvirin.weatherapp">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -25,6 +27,7 @@
         <activity android:name=".view.activity.StartActivity" />
 
         <service android:name=".service.LocationService" />
+        <service android:name=".service.RequestService" />
 
         <provider
             android:authorities="com.example.isvirin.weatherapp.data.DBContentProvider"
