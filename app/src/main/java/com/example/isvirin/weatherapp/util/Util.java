@@ -2,13 +2,16 @@ package com.example.isvirin.weatherapp.util;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 
 import com.example.isvirin.weatherapp.R;
+import com.example.isvirin.weatherapp.service.RequestService;
+import com.example.isvirin.weatherapp.view.activity.MainActivity;
 
 public class Util {
 
-    public static void showOurDialog(Context context, String message) {
+    public static void showOurDialog(final Context context, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.qustion_title)
                 .setMessage(message)
@@ -21,6 +24,7 @@ public class Util {
                 .setPositiveButton("ДА", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        context.startService(new Intent(context, RequestService.class));
                         dialog.dismiss();
                     }
                 });

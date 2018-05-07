@@ -48,6 +48,7 @@ import java.util.List;
 
 import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_COUNTRY;
 import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_NAME;
+import static com.example.isvirin.weatherapp.data.cache.SharedPreferencesManager.USER_LOCATION;
 import static com.example.isvirin.weatherapp.service.LocationService.GEO_INFO;
 import static com.example.isvirin.weatherapp.service.LocationService.LOCATION;
 import static com.example.isvirin.weatherapp.service.RequestService.WEATHER;
@@ -55,7 +56,6 @@ import static com.example.isvirin.weatherapp.service.RequestService.WEATHER_REQU
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ImageView imageView;
-    public static final String USER_LOCATION = "user_location";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 //        testDB();
 //        readDataWithCP();
-//        startService(new Intent(this, RequestService.class));
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
     }
 
@@ -251,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             preferencesManager.saveString(USER_LOCATION, location);
 
             Util.showOurDialog(context, "Ваш город - " + location + "?");
-        }
+            }
     };
 
     BroadcastReceiver broadcastReceiverWeather = new BroadcastReceiver() {

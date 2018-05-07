@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 public class SharedPreferencesManager {
     private Context context;
+    public static final String USER_LOCATION = "user_location";
+
 
     public SharedPreferencesManager(Context context) {
         this.context = context;
