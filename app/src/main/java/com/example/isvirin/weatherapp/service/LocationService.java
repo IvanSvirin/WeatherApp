@@ -48,19 +48,26 @@ public class LocationService extends Service {
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
-                List<Address> addressList = Collections.emptyList();
-                try {
-                    addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 5);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Address address = addressList.get(0);
-                String city = address.getLocality();
+                Intent intent1 = null;
+                if (location != null) {
+                    Geocoder geocoder = new Geocoder(getBaseContext(), Locale.getDefault());
+                    List<Address> addressList = Collections.emptyList();
+                    try {
+                        addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 5);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address address = addressList.get(0);
+                    String city = address.getLocality();
 
-                Intent intent1 = new Intent();
-                intent1.setAction(GEO_INFO);
-                intent1.putExtra(LOCATION, city);
+                    intent1 = new Intent();
+                    intent1.setAction(GEO_INFO);
+                    intent1.putExtra(LOCATION, city);
+                } else {
+                    intent1 = new Intent();
+                    intent1.setAction(GEO_INFO);
+                    intent1.putExtra(LOCATION, "London");
+                }
                 sendBroadcast(intent1);
                 stopSelf();
             }
