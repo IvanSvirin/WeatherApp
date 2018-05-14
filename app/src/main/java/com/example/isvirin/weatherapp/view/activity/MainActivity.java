@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_COUNTRY;
 import static com.example.isvirin.weatherapp.data.cache.DataBaseSQLite.COLUMN_NAME;
 import static com.example.isvirin.weatherapp.data.cache.SharedPreferencesManager.USER_LOCATION;
@@ -56,6 +58,11 @@ import static com.example.isvirin.weatherapp.service.RequestService.WEATHER_REQU
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ImageView imageView;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
