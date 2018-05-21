@@ -10,7 +10,8 @@ import com.example.isvirin.weatherapp.service.RequestService;
 import com.example.isvirin.weatherapp.view.activity.MainActivity;
 
 public class Util {
-
+    public static final String  url = "http://openweathermap.org/data/2.5/";
+    public static final String appId = "b6907d289e10d714a6e88b30761fae22";
     public static void showOurDialog(final Context context, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.qustion_title)

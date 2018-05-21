@@ -18,6 +18,10 @@ import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.request.FutureTarget;
 import com.example.isvirin.weatherapp.R;
 import com.example.isvirin.weatherapp.data.model.BriefWeather;
+import com.example.isvirin.weatherapp.data.model.currentweather.CurrentWeather;
+import com.example.isvirin.weatherapp.data.model.currentweather.Main;
+import com.example.isvirin.weatherapp.service.RestInterface;
+import com.example.isvirin.weatherapp.util.Util;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -34,6 +38,11 @@ import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.isvirin.weatherapp.service.RequestService.WEATHER;
 
@@ -54,11 +63,14 @@ public class RequestFragment extends Fragment {
     ImageView imageViewIcon;
     private String url = "http://openweathermap.org/data/2.5/weather?q=london&appid=b6907d289e10d714a6e88b30761fae22";
     private String response;
+    public static final String CITY_NAME = "CITY_NAME";
+    private String city;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         response = getArguments().getString(WEATHER);
+        city = getArguments().getString(CITY_NAME);
 
     }
 
@@ -75,45 +87,79 @@ public class RequestFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 //        new RequestTask().execute(url);
 
-        BriefWeather briefWeather = getWeather(response);
-        textViewTemp.setText(String.valueOf(briefWeather.getTemp()));
-        textViewPressure.setText(String.valueOf(briefWeather.getPressure()));
-        textViewHumidity.setText(String.valueOf(briefWeather.getHumidity()));
-        textViewTempMin.setText(String.valueOf(briefWeather.getTempMin()));
-        textViewTempMax.setText(String.valueOf(briefWeather.getTempMax()));
+//        BriefWeather briefWeather = getWeather(response);
+//        textViewTemp.setText(String.valueOf(briefWeather.getTemp()));
+//        textViewPressure.setText(String.valueOf(briefWeather.getPressure()));
+//        textViewHumidity.setText(String.valueOf(briefWeather.getHumidity()));
+//        textViewTempMin.setText(String.valueOf(briefWeather.getTempMin()));
+//        textViewTempMax.setText(String.valueOf(briefWeather.getTempMax()));
 
 //        Picasso.get()
 //                .load("http://openweathermap.org/img/w/10d.png")
 //                .resize(200, 200)
 //                .into(imageViewIcon);
 
-        Glide.with(getContext())
-                .load("http://openweathermap.org/img/w/10d.png")
-//                .override(200, 200)
-                .into(imageViewIcon);
+//        Glide.with(getContext())
+//                .load("http://openweathermap.org/img/w/10d.png")
+////                .override(200, 200)
+//                .into(imageViewIcon);
 
-        Bitmap bitmap = null;
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Drawable drawable = null;
-                FutureTarget<Drawable> futureTarget = Glide.with(getContext())
-                        .load("http://openweathermap.org/img/w/10d.png")
-                        .submit(200, 200);
-                try {
-                    drawable = futureTarget.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                int o = drawable.getMinimumWidth();
-
-            }
-        }).start();
+//        Bitmap bitmap = null;
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Drawable drawable = null;
+//                FutureTarget<Drawable> futureTarget = Glide.with(getContext())
+//                        .load("http://openweathermap.org/img/w/10d.png")
+//                        .submit(200, 200);
+//                try {
+//                    drawable = futureTarget.get();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();
+//                }
+//                int o = drawable.getMinimumWidth();
+//
+//            }
+//        }).start();
 //        int i = bitmap.getByteCount();
+        callRetrofit();
     }
+
+
+    private void callRetrofit() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Util.url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterface restInterface = retrofit.create(RestInterface.class);
+
+        restInterface.getWeatherReport(city, Util.appId).enqueue(new Callback<CurrentWeather>() {
+            @Override
+            public void onResponse(Call<CurrentWeather> call, Response<CurrentWeather> response) {
+                Main main = response.body().getMain();
+                textViewTemp.setText(String.valueOf(main.getTemp()));
+                textViewPressure.setText(String.valueOf(main.getPressure()));
+                textViewHumidity.setText(String.valueOf(main.getHumidity()));
+                textViewTempMin.setText(String.valueOf(main.getTempMin()));
+                textViewTempMax.setText(String.valueOf(main.getTempMax()));
+
+                Glide.with(getContext())
+                        .load("http://openweathermap.org/img/w/" + response.body().getWeather().get(0).getIcon() + ".png")
+//                .override(200, 200)
+                        .into(imageViewIcon);
+            }
+
+            @Override
+            public void onFailure(Call<CurrentWeather> call, Throwable t) {
+                t.getMessage();
+            }
+        });
+    }
+
 
     class RequestTask extends AsyncTask<String, Void, String> {
 

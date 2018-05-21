@@ -55,6 +55,7 @@ import static com.example.isvirin.weatherapp.service.LocationService.GEO_INFO;
 import static com.example.isvirin.weatherapp.service.LocationService.LOCATION;
 import static com.example.isvirin.weatherapp.service.RequestService.WEATHER;
 import static com.example.isvirin.weatherapp.service.RequestService.WEATHER_REQUEST;
+import static com.example.isvirin.weatherapp.view.fragment.RequestFragment.CITY_NAME;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ImageView imageView;
@@ -256,8 +257,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             SharedPreferencesManager preferencesManager = new SharedPreferencesManager(MainActivity.this);
             preferencesManager.saveString(USER_LOCATION, location);
 
-            Util.showOurDialog(context, "Ваш город - " + location + "?");
-            }
+//            Util.showOurDialog(context, "Ваш город - " + location + "?");
+
+            RequestFragment requestFragment = new RequestFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(CITY_NAME, location);
+            requestFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, requestFragment).commit();
+        }
     };
 
     BroadcastReceiver broadcastReceiverWeather = new BroadcastReceiver() {
@@ -268,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Bundle bundle = new Bundle();
             bundle.putString(WEATHER, string);
             requestFragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment, requestFragment).commit();
+//            getSupportFragmentManager().beginTransaction().add(R.id.fragment, requestFragment).commit();
         }
     };
 }
